@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Krushi Mitra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load staticfiles %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{% static 'login/admin.css' %}">
+
+</head>
+<body>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="{% url 'login:admin' %}"><span class="glyphicon glyphicon-grain" aria-hidden="true"></span>&nbsp; Krushi Mitra</a>
+          <ul class="nav navbar-nav">
+          <li><a href="{% url 'login:addexpert' %}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp; Add Expert</a></li>
+          <li><a href="https://console.firebase.google.com/u/2/project/krushimitra-efe8b/notification"><span class="glyphicon glyphicon-alert" style="color: red;" aria-hidden="true"></span>&nbsp; Send Alert</a></li>
+            </ul>
+      </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{% url 'login:logout' %}"><span class="glyphicon glyphicon-off" aria-hidden="true"></span>     &nbsp;Logout</a></li>
+      </ul>
+    </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-9 md9div">
+<div class="tab">
+    {% if not farmers %}
+        <button style="border-radius: 10px;" class="tablinks" onclick="openCity(event, 'No_Farmer')" id="defaultOpen">No Pending Queries</button>
+    {% endif %}
+    {% if farmers %}
+        {% for farmer,name,address in farmers %}
+            <button style="border-radius: 10px;" class="tablinks" onclick="openCity(event, '{{ farmer }}')" id="defaultOpen">{{ name }} -> {{ address }}</button>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div id="No_Farmer" class="tabcontent">
+      <div class="card">
+      </div>
+</div>
+{% if farmers %}
+{% for farmer,messagelist in main_message %}
+<div id="{{ farmer }}" class="tabcontent" style="color: black;">
+    {% for name,val,flag in messagelist %}
+      <div class="card" style="margin-bottom: 1px; border-radius: 20px; border: 3px solid black; background-color: white; color: black; padding-left: 15px;">
+      {% if not flag %}
+          <img src="{% static 'login/avatar.jpg' %}" class="img" alt="Avatar" style="width:7%; padding-top: 9px;">
+          <div class="content" >
+            <h4><b>{{ name }}</b></h4>
+            <p>{{ val }}</p>
+          </div>
+      {% else %}
+          <div class="content">
+                <img  style="border: 1px solid green; width: 50%; height: 200px;" src="{{ val }}">
+          </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+{% endif %}
+</div>
+
+<div class="col-md-3 md3div" style="border-radius: 20px;">
+
+      <div class="formed">
+          <form action="/assign/" method="post" style="display: block;" id="allocateForm">
+              {% csrf_token %}
+          <div class="form-group">
+              <label class="my-1 mr-2">Farmer</label>
+              <input type="text" name="farmerId" id="inp1" style="width: 300px; height: 25px;" required readonly><br>
+          </div>
+          <div>
+              <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Scientist</label>
+                <select required class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref" name="expertSelected" form="allocateForm" style="width: 300px; height: 25px;">
+                  <option selected name="expertSelected" value="">Choose...</option>
+                    {% for expertId,name in experts %}
+                        <option value="{{ expertId }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+          </div>
+          <div>
+              <input type="submit" style="background-color: black; color: white; height: 50px; width: 100px; border-radius: 5px;"  class="btn btn-primary my-1 submit" value="Allocate">
+          </div>
+          </form>
+      <div style="height: 350px;" >
+
+      </div>
+      <div style="height: 30px; width:300px;">
+          {% if num %}
+              <div class="card bg-light mb-3" style="max-width: 20rem;">
+              <div class="card-body">
+                  <h4 class="card-title"><b>Unresolved Queries: {{ num }}</b></h4>
+              </div>
+        {% endif %}
+      </div>
+      </div>
+</div>
+</div>
+</div>
+
+
+
+<script>
+function openCity(evt, cityName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+
+    $('#inp1').val(cityName);
+}
+
+// Get the element with id="defaultOpen" and click on it
+document.getElementById("defaultOpen").click();
+
+</script>
+
+</body>
+</html>
